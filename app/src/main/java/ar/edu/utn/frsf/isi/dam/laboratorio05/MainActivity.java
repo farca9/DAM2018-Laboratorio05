@@ -8,13 +8,17 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
+import android.Manifest;
+import android.content.Context;
+import android.content.pm.PackageManager;
+import android.location.Location;
+import android.location.LocationManager;
 
 
 // AGREGAR en MapaFragment una interface MapaFragment.OnMapaListener con el método coordenadasSeleccionadas 
 // IMPLEMENTAR dicho método en esta actividad.
 
-public class MainActivity extends AppCompatActivity implements FragmentManager.OnBackStackChangedListener,
-        NuevoReclamoFragment.OnNuevoLugarListener {
+public class MainActivity extends AppCompatActivity implements FragmentManager.OnBackStackChangedListener, NuevoReclamoFragment.OnNuevoLugarListener{
     private DrawerLayout drawerLayout;
     private NavigationView navView;
 
@@ -65,12 +69,12 @@ public class MainActivity extends AppCompatActivity implements FragmentManager.O
                                 //TODO si "fragment" es null entonces crear el fragmento mapa, agregar un bundel con el parametro tipo_mapa
                                 // configurar a la actividad como listener de los eventos del mapa ((MapaFragment) fragment).setListener(this);
                                 if(fragment == null){
-                                    MapaFragment mapaFragment = new MapaFragment();
+                                    fragment = new MapaFragment();
                                     Bundle bundle = new Bundle();
                                     bundle.putInt("tipo_mapa",0);
-                                    mapaFragment.setArguments(bundle);
-
+                                    fragment.setArguments(bundle);
                                 }
+                                ((MapaFragment) fragment).setListener(MainActivity.this);
                                 fragmentTransaction = true;
                                 break;
                             case R.id.optHeatMap:
