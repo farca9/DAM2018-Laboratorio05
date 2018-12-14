@@ -1,8 +1,11 @@
 package ar.edu.utn.frsf.isi.dam.laboratorio05;
 
+import android.os.Build;
 import android.support.design.widget.NavigationView;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -14,11 +17,13 @@ import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationManager;
 
+import ar.edu.utn.frsf.isi.dam.laboratorio05.modelo.MapaListener;
+
 
 // AGREGAR en MapaFragment una interface MapaFragment.OnMapaListener con el método coordenadasSeleccionadas 
 // IMPLEMENTAR dicho método en esta actividad.
 
-public class MainActivity extends AppCompatActivity implements FragmentManager.OnBackStackChangedListener, NuevoReclamoFragment.OnNuevoLugarListener{
+public class MainActivity extends AppCompatActivity implements FragmentManager.OnBackStackChangedListener, NuevoReclamoFragment.OnNuevoLugarListener, MapaListener{
     private DrawerLayout drawerLayout;
     private NavigationView navView;
 
@@ -66,6 +71,7 @@ public class MainActivity extends AppCompatActivity implements FragmentManager.O
                                 //TODO HABILITAR
                                 tag="mapaReclamos";
                                 fragment =  getSupportFragmentManager().findFragmentByTag(tag);
+
                                 //TODO si "fragment" es null entonces crear el fragmento mapa, agregar un bundel con el parametro tipo_mapa
                                 // configurar a la actividad como listener de los eventos del mapa ((MapaFragment) fragment).setListener(this);
                                 if(fragment == null){
@@ -161,4 +167,7 @@ public class MainActivity extends AppCompatActivity implements FragmentManager.O
             // a seleccionar la coordenada donde se registra el reclamo
             // configurar a la actividad como listener de los eventos del mapa ((MapaFragment) fragment).setListener(this);
         }
+
+
+
 }
