@@ -15,28 +15,39 @@ import android.widget.TextView;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.LatLng;
 
-import ar.edu.utn.frsf.isi.dam.laboratorio05.modelo.MapaListener;
 
 /**
  * A simple {@link Fragment} subclass.
  */
 public class MapaFragment extends SupportMapFragment implements OnMapReadyCallback {
     private GoogleMap miMapa;
-    private MapaListener listener;
+    private OnMapaListener listener;
+    private int tipoMapa = 0;
 
-    public MapaFragment() {
+    public MapaFragment() { }
+
+
+    public interface OnMapaListener{
+        void coordenadasSeleccionadas(LatLng c);
     }
+
+    public void setListener(OnMapaListener listener){ this.listener = listener; }
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+
         View rootView = super.onCreateView(inflater, container, savedInstanceState);
-        int tipoMapa = 0;
+
         Bundle argumentos = getArguments();
+
         if (argumentos != null) {
             tipoMapa = argumentos.getInt("tipo_mapa", 0);
         }
         getMapAsync(this);
+
 
 
         return rootView;
@@ -45,14 +56,23 @@ public class MapaFragment extends SupportMapFragment implements OnMapReadyCallba
     @Override
     public void onMapReady(GoogleMap map) {
         miMapa = map;
-        solicitarPermisos();
+        actualizarMapa();
+
+        miMapa.setOnMapLongClickListener(new GoogleMap.OnMapLongClickListener() {
+            @Override
+            public void onMapLongClick(LatLng latLng) {
+                if(tipoMapa == 1){
+                    listener.coordenadasSeleccionadas(latLng);
+                }
+
+            }
+        }
+        );
     }
 
-    public void setListener(MapaListener mapaListener) {
-        this.listener = mapaListener;
-    }
 
-    private void solicitarPermisos(){
+
+    private void actualizarMapa(){
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
             if(ActivityCompat.checkSelfPermission(getContext(),Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED){
                 ActivityCompat.requestPermissions((MainActivity)listener, new String[] {Manifest.permission.ACCESS_FINE_LOCATION}, 0);
@@ -71,12 +91,12 @@ public class MapaFragment extends SupportMapFragment implements OnMapReadyCallba
 
         switch(requestCode){
             case 0:
-                if ((permisoUbicacionConcedido = grantResults[0]) == PackageManager.PERMISSION_GRANTED){
-                    solicitarPermisos();
+                if (grantResults.length > 0 && ((permisoUbicacionConcedido = grantResults[0]) == PackageManager.PERMISSION_GRANTED)){
+                    actualizarMapa();
                 }
-                else{
-                    return;
-                }
+                return;
         }
     }
+
+
 }
