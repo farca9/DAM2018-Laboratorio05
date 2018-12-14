@@ -3,6 +3,7 @@ package ar.edu.utn.frsf.isi.dam.laboratorio05;
 
 import android.Manifest;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
@@ -12,10 +13,21 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptor;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
+import com.google.android.gms.maps.model.MarkerOptions;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import ar.edu.utn.frsf.isi.dam.laboratorio05.modelo.MyDatabase;
+import ar.edu.utn.frsf.isi.dam.laboratorio05.modelo.Reclamo;
 
 
 /**
@@ -25,6 +37,7 @@ public class MapaFragment extends SupportMapFragment implements OnMapReadyCallba
     private GoogleMap miMapa;
     private OnMapaListener listener;
     private int tipoMapa = 0;
+    private List<Reclamo> reclamos;
 
     public MapaFragment() { }
 
@@ -48,7 +61,9 @@ public class MapaFragment extends SupportMapFragment implements OnMapReadyCallba
         }
         getMapAsync(this);
 
-
+        if(tipoMapa == 2){
+            buscarReclamos();
+        }
 
         return rootView;
     }
@@ -61,16 +76,41 @@ public class MapaFragment extends SupportMapFragment implements OnMapReadyCallba
         miMapa.setOnMapLongClickListener(new GoogleMap.OnMapLongClickListener() {
             @Override
             public void onMapLongClick(LatLng latLng) {
+                //Si el mapa es de tipo 1 se activa la opcion para que tome el click largo
+                //Sino no hace nada
                 if(tipoMapa == 1){
                     listener.coordenadasSeleccionadas(latLng);
                 }
-
             }
         }
         );
+
+        if(tipoMapa > 1){
+            List<LatLng> coordenadas = new ArrayList<LatLng>();
+            for(Reclamo r : reclamos){
+                miMapa.addMarker(new MarkerOptions()
+                .position(new LatLng(r.getLatitud(), r.getLongitud()))
+                .title(r.getReclamo())
+                        .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED))
+                );
+
+                coordenadas.add(new LatLng(r.getLatitud(), r.getLongitud()));
+            }
+
+            LatLngBounds limite = establecerLimitesMapa(coordenadas);
+            miMapa.moveCamera(CameraUpdateFactory.newLatLngBounds(limite, 300));
+        }
     }
 
+    private LatLngBounds establecerLimitesMapa(List<LatLng> coordenadas){
+        LatLngBounds.Builder limites = new LatLngBounds.Builder();
 
+        for(Reclamo r: reclamos){
+            limites.include(new LatLng(r.getLatitud(), r.getLongitud()));
+        }
+
+        return limites.build();
+    }
 
     private void actualizarMapa(){
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
@@ -98,5 +138,14 @@ public class MapaFragment extends SupportMapFragment implements OnMapReadyCallba
         }
     }
 
+    public void buscarReclamos(){
+        Thread t = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                MapaFragment.this.reclamos = MyDatabase.getInstance(getActivity()).getReclamoDao().getAll();
+            }
+        });
+        t.start();
+    }
 
 }
