@@ -24,6 +24,9 @@ import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.TileOverlay;
+import com.google.android.gms.maps.model.TileOverlayOptions;
+import com.google.maps.android.heatmaps.HeatmapTileProvider;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -72,6 +75,9 @@ public class MapaFragment extends SupportMapFragment implements OnMapReadyCallba
             buscarReclamos();
         }
 
+        if(tipoMapa == 4){
+            buscarReclamos();
+        }
         return rootView;
     }
 
@@ -136,6 +142,20 @@ public class MapaFragment extends SupportMapFragment implements OnMapReadyCallba
             .strokeWidth(3));
 
         }
+
+        if(tipoMapa == 4){
+            buscarReclamos();
+            List<LatLng> coordenadas = new ArrayList<LatLng>();
+            for(Reclamo r : reclamos){
+                coordenadas.add(new LatLng(r.getLatitud(), r.getLongitud()));
+            }
+
+            LatLngBounds limite = establecerLimitesMapa(coordenadas);
+            miMapa.moveCamera(CameraUpdateFactory.newLatLngBounds(limite, 300));
+
+            HeatmapTileProvider mProvider = new HeatmapTileProvider.Builder().data(coordenadas).build();
+            TileOverlay mOverlay = miMapa.addTileOverlay(new TileOverlayOptions().tileProvider(mProvider));
+        }
     }
 
     private LatLngBounds establecerLimitesMapa(List<LatLng> coordenadas){
@@ -183,5 +203,6 @@ public class MapaFragment extends SupportMapFragment implements OnMapReadyCallba
         });
         t.start();
     }
+
 
 }
