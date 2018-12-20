@@ -24,6 +24,7 @@ import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.gms.maps.model.TileOverlay;
 import com.google.android.gms.maps.model.TileOverlayOptions;
 import com.google.maps.android.heatmaps.HeatmapTileProvider;
@@ -67,15 +68,7 @@ public class MapaFragment extends SupportMapFragment implements OnMapReadyCallba
         }
         getMapAsync(this);
 
-        if(tipoMapa == 2){
-            buscarReclamos();
-        }
-
-        if(tipoMapa == 3){
-            buscarReclamos();
-        }
-
-        if(tipoMapa == 4){
+        if(tipoMapa > 1){
             buscarReclamos();
         }
         return rootView;
@@ -155,6 +148,31 @@ public class MapaFragment extends SupportMapFragment implements OnMapReadyCallba
 
             HeatmapTileProvider mProvider = new HeatmapTileProvider.Builder().data(coordenadas).build();
             TileOverlay mOverlay = miMapa.addTileOverlay(new TileOverlayOptions().tileProvider(mProvider));
+        }
+
+        if(tipoMapa==5){
+            buscarReclamos();
+
+            String tipo = getArguments().getString("tipoReclamo");
+            PolylineOptions po = new PolylineOptions();
+
+            List<LatLng> coordenadas = new ArrayList<LatLng>();
+            for(Reclamo r : reclamos) {
+                if (r.getTipo().toString().equals(tipo)) {
+                    miMapa.addMarker(new MarkerOptions()
+                            .position(new LatLng(r.getLatitud(), r.getLongitud()))
+                            .title(r.getReclamo())
+                            .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED))
+                    );
+
+                    coordenadas.add(new LatLng(r.getLatitud(), r.getLongitud()));
+                    po.add(new LatLng(r.getLatitud(), r.getLongitud())).color(Color.RED);
+                }
+            }
+
+                miMapa.addPolyline(po);
+                LatLngBounds limite = establecerLimitesMapa(coordenadas);
+                miMapa.moveCamera(CameraUpdateFactory.newLatLngBounds(limite, 300));
         }
     }
 

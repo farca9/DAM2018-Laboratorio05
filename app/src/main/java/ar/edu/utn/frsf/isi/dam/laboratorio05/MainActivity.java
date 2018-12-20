@@ -19,11 +19,15 @@ import android.location.LocationManager;
 
 import com.google.android.gms.maps.model.LatLng;
 
+import java.text.Normalizer;
+
+import ar.edu.utn.frsf.isi.dam.laboratorio05.modelo.Reclamo;
+
 
 // AGREGAR en MapaFragment una interface MapaFragment.OnMapaListener con el método coordenadasSeleccionadas
 // IMPLEMENTAR dicho método en esta actividad.
 
-public class MainActivity extends AppCompatActivity implements FragmentManager.OnBackStackChangedListener, NuevoReclamoFragment.OnNuevoLugarListener, MapaFragment.OnMapaListener{
+public class MainActivity extends AppCompatActivity implements FormularioFragment.FormularioListener, FragmentManager.OnBackStackChangedListener, NuevoReclamoFragment.OnNuevoLugarListener, MapaFragment.OnMapaListener{
     private DrawerLayout drawerLayout;
     private NavigationView navView;
 
@@ -94,6 +98,11 @@ public class MainActivity extends AppCompatActivity implements FragmentManager.O
                                 }
                                 ((MapaFragment) fragment).setListener(MainActivity.this);
                                 fragmentTransaction = true;
+                                break;
+                            case R.id.formulario:
+                                fragment = new FormularioFragment();
+                                ((FormularioFragment)fragment).setListener(MainActivity.this);
+                                fragmentTransaction=true;
                                 break;
                         }
 
@@ -187,7 +196,26 @@ public class MainActivity extends AppCompatActivity implements FragmentManager.O
                 .addToBackStack(tag)
                 .commit();
     }
-    };
+
+    @Override
+    public void devolverTipo(Reclamo.TipoReclamo tipoReclamo) {
+
+        String tag="mapaPorTipoReclamo";
+        Fragment fragment = new MapaFragment();
+        Bundle bundle = new Bundle();
+        bundle.putInt("tipo_mapa",5);
+        bundle.putString("tipoReclamo",tipoReclamo.toString());
+        fragment.setArguments(bundle);
+        ((MapaFragment) fragment).setListener(MainActivity.this);
+        getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.contenido, fragment,tag)
+                .addToBackStack(tag)
+                .commit();
+        getSupportActionBar().setTitle("Mapa por tipo de reclamo");
+
+    }
+};
 
 
 
