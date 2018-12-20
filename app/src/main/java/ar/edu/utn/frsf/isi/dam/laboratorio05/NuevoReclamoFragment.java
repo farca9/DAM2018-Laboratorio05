@@ -1,9 +1,12 @@
 package ar.edu.utn.frsf.isi.dam.laboratorio05;
 
 
+import android.content.Intent;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.provider.MediaStore;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,8 +14,12 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
+
+import java.io.ByteArrayOutputStream;
+import java.nio.ByteBuffer;
 
 import ar.edu.utn.frsf.isi.dam.laboratorio05.modelo.MyDatabase;
 import ar.edu.utn.frsf.isi.dam.laboratorio05.modelo.Reclamo;
@@ -38,6 +45,8 @@ public class NuevoReclamoFragment extends Fragment {
     private Button buscarCoord;
     private Button btnGuardar;
     private OnNuevoLugarListener listener;
+    private Button btnTomarFoto;
+    private ImageView imageView;
 
     private ArrayAdapter<Reclamo.TipoReclamo> tipoReclamoAdapter;
     public NuevoReclamoFragment() {
@@ -52,6 +61,8 @@ public class NuevoReclamoFragment extends Fragment {
 
         View v = inflater.inflate(R.layout.fragment_nuevo_reclamo, container, false);
 
+        btnTomarFoto = v.findViewById(R.id.btnTomarFoto);
+        imageView = v.findViewById(R.id.imageView);
         reclamoDesc = (EditText) v.findViewById(R.id.reclamo_desc);
         mail= (EditText) v.findViewById(R.id.reclamo_mail);
         tipoReclamo= (Spinner) v.findViewById(R.id.reclamo_tipo);
@@ -90,7 +101,33 @@ public class NuevoReclamoFragment extends Fragment {
                 saveOrUpdateReclamo();
             }
         });
+
+        btnTomarFoto.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                startActivityForResult(intent,18);
+            }
+        });
         return v;
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data){
+
+        if(requestCode == 18){
+
+            Bundle extras = data.getExtras();
+            Bitmap bmp = (Bitmap)extras.get("data");
+            imageView.setImageBitmap(bmp);
+            ByteArrayOutputStream stream = new ByteArrayOutputStream();
+            bmp.compress(Bitmap.CompressFormat.PNG, 100, stream);
+            byte[] byteArray = stream.toByteArray();
+            //bmp.recycle();
+            reclamoActual.setImage(byteArray);
+
+        }
+
     }
 
     private void cargarReclamo(final int id){
@@ -131,6 +168,7 @@ public class NuevoReclamoFragment extends Fragment {
         reclamoActual.setEmail(mail.getText().toString());
         reclamoActual.setReclamo(reclamoDesc.getText().toString());
         reclamoActual.setTipo(tipoReclamoAdapter.getItem(tipoReclamo.getSelectedItemPosition()));
+
         if(tvCoord.getText().toString().length()>0 && tvCoord.getText().toString().contains(";")) {
             String[] coordenadas = tvCoord.getText().toString().split(";");
             reclamoActual.setLatitud(Double.valueOf(coordenadas[0]));

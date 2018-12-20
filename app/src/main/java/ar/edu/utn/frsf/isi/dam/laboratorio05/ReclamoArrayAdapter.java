@@ -1,5 +1,6 @@
 package ar.edu.utn.frsf.isi.dam.laboratorio05;
 import android.content.Context;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -8,6 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 
@@ -39,12 +41,14 @@ public class ReclamoArrayAdapter extends ArrayAdapter<Reclamo> {
         if(v==null){
             v = LayoutInflater.from(getContext()).inflate(R.layout.fila_reclamo,null);
         }
+        ImageView imageView = v.findViewById(R.id.imageViewLista);
         TextView tvTitulo = (TextView) v.findViewById(R.id.fila_reclamo_titulo);
         TextView tvTipo = (TextView) v.findViewById(R.id.fila_reclamo_tipo);
         Button btnEditar= (Button) v.findViewById(R.id.btnEditar);
         Button btnBorrar= (Button) v.findViewById(R.id.btnBorrar);
         Button btnVerMapa= (Button) v.findViewById(R.id.btnVerEnMapa);
         Reclamo aux = getItem(position);
+        imageView.setImageBitmap(BitmapFactory.decodeByteArray(aux.getImage(), 0, aux.getImage().length));
         tvTitulo.setText(aux.getReclamo());
         tvTipo.setText(aux.getTipo().toString());
         btnEditar.setTag(aux.getId());

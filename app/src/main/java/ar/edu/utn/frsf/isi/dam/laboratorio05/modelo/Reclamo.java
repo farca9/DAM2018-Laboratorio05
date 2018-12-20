@@ -1,5 +1,6 @@
 package ar.edu.utn.frsf.isi.dam.laboratorio05.modelo;
 
+import android.arch.persistence.room.ColumnInfo;
 import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.PrimaryKey;
 import android.arch.persistence.room.TypeConverters;
@@ -18,7 +19,7 @@ public class Reclamo {
     private String email;
     @TypeConverters(TipoReclamoConverter.class)
     private TipoReclamo tipo;
-    
+    @ColumnInfo(typeAffinity = ColumnInfo.BLOB)
     private byte[] image;
 
     public Double getLatitud() {
@@ -67,5 +68,13 @@ public class Reclamo {
 
     public void setId(long id) {
         this.id = id;
+    }
+
+    public byte[] getImage() {
+        return image;
+    }
+
+    public void setImage(byte[] image) {
+        this.image = image;
     }
 }
