@@ -4,6 +4,7 @@ package ar.edu.utn.frsf.isi.dam.laboratorio05;
 import android.Manifest;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
@@ -19,6 +20,7 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -38,6 +40,7 @@ public class MapaFragment extends SupportMapFragment implements OnMapReadyCallba
     private OnMapaListener listener;
     private int tipoMapa = 0;
     private List<Reclamo> reclamos;
+    private Reclamo reclamoSeleccionado;
 
     public MapaFragment() { }
 
@@ -65,6 +68,10 @@ public class MapaFragment extends SupportMapFragment implements OnMapReadyCallba
             buscarReclamos();
         }
 
+        if(tipoMapa == 3){
+            buscarReclamos();
+        }
+
         return rootView;
     }
 
@@ -85,7 +92,7 @@ public class MapaFragment extends SupportMapFragment implements OnMapReadyCallba
         }
         );
 
-        if(tipoMapa > 1){
+        if(tipoMapa == 2){
             List<LatLng> coordenadas = new ArrayList<LatLng>();
             for(Reclamo r : reclamos){
                 miMapa.addMarker(new MarkerOptions()
@@ -99,6 +106,35 @@ public class MapaFragment extends SupportMapFragment implements OnMapReadyCallba
 
             LatLngBounds limite = establecerLimitesMapa(coordenadas);
             miMapa.moveCamera(CameraUpdateFactory.newLatLngBounds(limite, 300));
+        }
+
+        if(tipoMapa == 3){
+
+
+            for(Reclamo r: reclamos){
+                if(r.getId()==getArguments().getLong("idReclamo")){
+                    reclamoSeleccionado=r;
+                }
+            }
+
+            List<LatLng> coordenadas = new ArrayList<LatLng>();
+
+            miMapa.addMarker(new MarkerOptions()
+                    .position(new LatLng(reclamoSeleccionado.getLatitud(), reclamoSeleccionado.getLongitud()))
+                    .title(reclamoSeleccionado.getReclamo()).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED))
+            );
+
+            coordenadas.add(new LatLng(reclamoSeleccionado.getLatitud(), reclamoSeleccionado.getLongitud()));
+
+            miMapa.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(reclamoSeleccionado.getLatitud(), reclamoSeleccionado.getLongitud()),15));
+
+            miMapa.addCircle(new CircleOptions()
+            .center(new LatLng(reclamoSeleccionado.getLatitud(),reclamoSeleccionado.getLongitud()))
+            .radius(500)
+            .strokeColor(Color.RED)
+            .fillColor(0x20FF0000)
+            .strokeWidth(3));
+
         }
     }
 

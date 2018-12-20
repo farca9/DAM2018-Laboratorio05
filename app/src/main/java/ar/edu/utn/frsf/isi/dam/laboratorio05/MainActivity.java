@@ -153,6 +153,7 @@ public class MainActivity extends AppCompatActivity implements FragmentManager.O
             getSupportFragmentManager()
                     .beginTransaction()
                     .replace(R.id.contenido, fragment,tag)
+                    .addToBackStack(null)
                     .commit();
 
         }
