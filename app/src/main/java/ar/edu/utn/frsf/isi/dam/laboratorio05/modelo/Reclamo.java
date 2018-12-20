@@ -18,6 +18,8 @@ public class Reclamo {
     private String email;
     @TypeConverters(TipoReclamoConverter.class)
     private TipoReclamo tipo;
+    
+    private byte[] image;
 
     public Double getLatitud() {
         return latitud;
