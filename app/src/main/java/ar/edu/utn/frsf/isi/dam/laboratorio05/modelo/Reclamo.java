@@ -22,6 +22,7 @@ public class Reclamo {
     @ColumnInfo(typeAffinity = ColumnInfo.BLOB)
     private byte[] image;
 
+
     public Double getLatitud() {
         return latitud;
     }
