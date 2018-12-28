@@ -19,12 +19,14 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -166,7 +168,19 @@ public class NuevoReclamoFragment extends Fragment {
         btnGuardar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                saveOrUpdateReclamo();
+                if(tipoReclamo.getSelectedItemPosition()!=0 && tipoReclamo.getSelectedItemPosition()!=3){ //si no es vereda o calle en mal estado
+
+                    if(reclamoDesc.getText().toString().length()>=8 || !(reclamoActual.getAudioPath()==null)){
+                        saveOrUpdateReclamo();
+                    } else {
+
+                        Toast.makeText(view.getContext(), "Agregue un audio o una descripcion", Toast.LENGTH_SHORT).show();
+
+                    }
+
+                }
+
+
             }
         });
 
@@ -178,6 +192,21 @@ public class NuevoReclamoFragment extends Fragment {
             }
         });
 
+        tipoReclamo.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                if(position == 0 || position == 3){
+                    if(reclamoActual.getImage() == null){
+                        btnGuardar.setEnabled(false);
+                    } else btnGuardar.setEnabled(true);
+                } else btnGuardar.setEnabled(true);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
 
         return v;
     }
