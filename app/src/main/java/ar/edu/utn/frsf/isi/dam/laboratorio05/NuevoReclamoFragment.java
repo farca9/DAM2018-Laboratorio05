@@ -64,7 +64,6 @@ public class NuevoReclamoFragment extends Fragment {
     private View.OnClickListener listenerAudio;
     private MediaRecorder mediaRecorder;
     private MediaPlayer mediaPlayer;
-    private String pathAudio;
     private boolean reproduciendo = false;
     private boolean grabando = false;
 
@@ -99,16 +98,13 @@ public class NuevoReclamoFragment extends Fragment {
 
 
         //req 02 grabar audio
-
         listenerAudio = new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 switch (v.getId()){
                     case R.id.btnGrabarAudio:
-                        System.out.println("switch");
                         if(ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED){
-                            ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.RECORD_AUDIO}, 000);
-                            System.out.println("aaa");
+                            ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.RECORD_AUDIO}, 15);
                         }
                         else{
                             if(grabando){
@@ -120,7 +116,6 @@ public class NuevoReclamoFragment extends Fragment {
                                 ((Button) v).setText("Grabando...");
                                 grabando = true;
                                 grabarAudio();
-                                System.out.println("else");
                             }
                         }
                         break;
@@ -136,7 +131,6 @@ public class NuevoReclamoFragment extends Fragment {
                             reproducir();
                         }
                         break;
-                        default: System.out.println("asd");
                 }
             }
         };
@@ -145,7 +139,7 @@ public class NuevoReclamoFragment extends Fragment {
         mediaRecorder = null;
         btnGrabarAudio.setOnClickListener(listenerAudio);
         btnReproducirAudio.setOnClickListener(listenerAudio);
-        pathAudio =  Environment.getExternalStorageDirectory().getAbsolutePath()+"/audiorecordtest.3gp";
+        //pathAudio =  Environment.getExternalStorageDirectory().getAbsolutePath()+"/audiorecordtest.3gp";
 
 
         int idReclamo =0;
@@ -285,7 +279,13 @@ public class NuevoReclamoFragment extends Fragment {
         mediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
 
         try{
-            mediaRecorder.setOutputFile(pathAudio);
+            this.createAudioFile();
+        } catch(IOException exception){
+            exception.printStackTrace();
+        }
+
+        try{
+            mediaRecorder.setOutputFile(reclamoActual.getAudioPath());
             mediaRecorder.prepare();
         }
         catch(IOException e){
@@ -306,14 +306,14 @@ public class NuevoReclamoFragment extends Fragment {
                 ".3gp", /* suffix */
                 dir /* directory */
         );
-        pathAudio = audio.getAbsolutePath();
+        reclamoActual.setAudioPath(audio.getAbsolutePath());
         return audio;
     }
 
     private void reproducir(){
         mediaPlayer = new MediaPlayer();
         try{
-            mediaPlayer.setDataSource(pathAudio);
+            mediaPlayer.setDataSource(reclamoActual.getAudioPath());
             mediaPlayer.prepare();
             mediaPlayer.start();
         }

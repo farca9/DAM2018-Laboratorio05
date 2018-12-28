@@ -21,7 +21,15 @@ public class Reclamo {
     private TipoReclamo tipo;
     @ColumnInfo(typeAffinity = ColumnInfo.BLOB)
     private byte[] image;
+    private String audioPath;
 
+    public String getAudioPath() {
+        return audioPath;
+    }
+
+    public void setAudioPath(String audioPath) {
+        this.audioPath = audioPath;
+    }
 
     public Double getLatitud() {
         return latitud;
