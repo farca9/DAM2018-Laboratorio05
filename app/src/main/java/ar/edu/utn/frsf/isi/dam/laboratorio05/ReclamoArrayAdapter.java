@@ -47,8 +47,9 @@ public class ReclamoArrayAdapter extends ArrayAdapter<Reclamo> {
         Button btnEditar= (Button) v.findViewById(R.id.btnEditar);
         Button btnBorrar= (Button) v.findViewById(R.id.btnBorrar);
         Button btnVerMapa= (Button) v.findViewById(R.id.btnVerEnMapa);
+
         Reclamo aux = getItem(position);
-        imageView.setImageBitmap(BitmapFactory.decodeByteArray(aux.getImage(), 0, aux.getImage().length));
+        if(aux.getImage()!=null) imageView.setImageBitmap(BitmapFactory.decodeByteArray(aux.getImage(), 0, aux.getImage().length));
         tvTitulo.setText(aux.getReclamo());
         tvTipo.setText(aux.getTipo().toString());
         btnEditar.setTag(aux.getId());
